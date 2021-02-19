@@ -30,11 +30,13 @@ private:
     void createAudioInput();
     void createAudioOutput();
     int ApplyVolumeToSample(qint16 iSample);
+    void setNewDevice();
 
 private slots:
     void readMore();
     void sliderValueChanged(int value);
     void menuAction(QAction* action);
+    void changeDevice();
 
 private:
     QAudioDeviceInfo m_inputDeviceInfo;
@@ -42,15 +44,15 @@ private:
     QScopedPointer<QAudioInput> m_audioInput;
     QScopedPointer<QAudioOutput> m_audioOutput;
     QScopedPointer<QIODevice> m_inputDevice;
-    QScopedPointer<QIODevice> m_outputDevice;
+//    QScopedPointer<QIODevice> m_outputDevice;  // Something went wrong with scoped ponter
+    QIODevice*  m_outputDevice;
     QByteArray m_buffer;
     QAudioFormat m_format;
     int m_volume = 0;
-    QScopedPointer<Settings> m_settings;
+    Settings* m_settings;
 
 private:
     Ui::MainWindow *ui;
-    Ui::Settings *settings_ui;
 };
 
 #endif // MAINWINDOW_H

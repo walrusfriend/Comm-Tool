@@ -18,10 +18,22 @@ public:
     explicit Settings(QWidget *parent = nullptr);
     ~Settings();
 
-    void blank() { qDebug() << "BLANK"; }
+    QAudioDeviceInfo getInputInfo() { return inputDeviceInfo; }
+    QAudioDeviceInfo getOutputInfo() { return outputDeviceInfo; }
+
+public slots:
+    void inputDeviceChanged();
+    void outputDeviceChanged();
+    void emitAcceptSignal() { emit deviceIsSelected(); }
+
+signals:
+    void deviceIsSelected();
 
 private:
     Ui::Settings *ui;
+
+    QAudioDeviceInfo inputDeviceInfo;
+    QAudioDeviceInfo outputDeviceInfo;
 };
 
 #endif // SETTINGS_H

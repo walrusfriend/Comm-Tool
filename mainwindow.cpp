@@ -7,6 +7,7 @@ const int LIMIT_SAMPLE = 4096;
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     m_buffer(BUFFER_SIZE, 0),
+    m_settings(new Settings),
     ui(new Ui::MainWindow)
 {
     // setup audio format
@@ -20,12 +21,6 @@ MainWindow::MainWindow(QWidget *parent) :
     m_inputDeviceInfo = QAudioDeviceInfo::defaultInputDevice();
     m_outputDeviceInfo = QAudioDeviceInfo::defaultOutputDevice();
 
-    // check for existing
-    if (m_inputDeviceInfo.isNull()) {
-        QMessageBox::warning(nullptr, "audio",
-                             "There is no audio device avaliable.");
-    }
-
     // check for supprt our format for current I/O devices
     if (!m_inputDeviceInfo.isFormatSupported(m_format)) {
         qWarning("This format for input device is not supported. Apply nearest format.");
@@ -36,13 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
         m_format = m_outputDeviceInfo.nearestFormat(m_format);
     }
 
-    createAudioInput();
-    createAudioOutput();
-
-    m_inputDevice.reset(m_audioInput->start());
-    m_outputDevice.reset(m_audioOutput->start());
-
-    connect(m_inputDevice.data(), SIGNAL(readyRead()), this, SLOT(readMore()));
+    setNewDevice();
 
     ui->setupUi(this);
 }
@@ -70,6 +59,22 @@ void MainWindow::createAudioOutput()
 int MainWindow::ApplyVolumeToSample(qint16 iSample)
 {
     return std::max(std::min((iSample * m_volume / 50), 35535), -35535);
+}
+
+void MainWindow::setNewDevice()
+{
+    if (!m_inputDevice.isNull())
+        m_audioInput->stop();
+    if (m_outputDevice == nullptr)
+        m_audioOutput->stop();
+
+    createAudioInput();
+    createAudioOutput();
+
+    m_inputDevice.reset(m_audioInput->start());
+    m_outputDevice = m_audioOutput->start();
+
+    connect(m_inputDevice.data(), SIGNAL(readyRead()), this, SLOT(readMore()));
 }
 
 void MainWindow::readMore()
@@ -105,22 +110,19 @@ void MainWindow::sliderValueChanged(int value)
 void MainWindow::menuAction(QAction* action)
 {
     if (action->text() == "&Settings") {
-        m_settings.reset(new Settings);
+        m_settings->show();
 
-        m_settings.data()->blank();
-
-        // new I/O devices after change
-        создать временные переменные в объекте класса settings и вернуть их сюда через геттер
-        /*m_inputDeviceInfo = QAudioDeviceInfo::defaultInputDevice();
-        m_outputDeviceInfo = QAudioDeviceInfo::defaultOutputDevice();
-
-        createAudioInput();
-        createAudioOutput();
-
-        m_inputDevice.reset(m_audioInput->start());
-        m_outputDevice.reset(m_audioOutput->start());
-        */
+        // Change device after device is selected in combo box
+        connect(m_settings, SIGNAL(deviceIsSelected()), this, SLOT(changeDevice()));
     }
     if (action->text() == "&About...")
-        qDebug() << "We'ra in the \"about\" section!";
+        qDebug() << "We're in the \"about\" section!";
+}
+
+void MainWindow::changeDevice()
+{
+    m_inputDeviceInfo = m_settings->getInputInfo();
+    m_outputDeviceInfo = m_settings->getOutputInfo();
+
+    setNewDevice();
 }
