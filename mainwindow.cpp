@@ -1,3 +1,5 @@
+#include <qmath.h>
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -7,6 +9,9 @@ const int LIMIT_SAMPLE = 4096;
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     m_buffer(BUFFER_SIZE, 0),
+    m_maxAmplitude(0),
+    m_micVolume(50),
+    m_phnVolume(50),
     m_settings(new Settings),
     ui(new Ui::MainWindow)
 {
@@ -17,6 +22,8 @@ MainWindow::MainWindow(QWidget *parent) :
     m_format.setCodec("audio/pcm");
     m_format.setByteOrder(QAudioFormat::LittleEndian);
     m_format.setSampleType(QAudioFormat::UnSignedInt);
+
+    m_maxAmplitude = pow(2, m_format.sampleSize()) / 2 - 1;
 
     m_inputDeviceInfo = QAudioDeviceInfo::defaultInputDevice();
     m_outputDeviceInfo = QAudioDeviceInfo::defaultOutputDevice();
@@ -56,9 +63,9 @@ void MainWindow::createAudioOutput()
     m_audioOutput.reset(new QAudioOutput(m_outputDeviceInfo, m_format, this));
 }
 
-int MainWindow::ApplyVolumeToSample(qint16 iSample)
+qint16 MainWindow::ApplyVolumeToSample(qint16 iSample)
 {
-    return std::max(std::min((iSample * m_volume / 50), 35535), -35535);
+    return std::max(std::min((iSample * m_micVolume / 50), 32767), -32768);
 }
 
 void MainWindow::setNewDevice()
@@ -93,9 +100,25 @@ void MainWindow::readMore()
     if (len > 0) {
         qint16* outdata = reinterpret_cast<qint16*>(m_buffer.data());
 
-        // apply volume to raw data
-        for (int i = 0; i < len; ++i)
+        qint32 maxValue = 0;
+        for (int i = 0; i < len; ++i) {
+            // apply volume to raw data
             outdata[i] = ApplyVolumeToSample(outdata[i]);
+
+            // find max value for draw the volume bar
+//            qint32 value = *reinterpret_cast<qint16*>(outdata);
+            qint32 value = outdata[i];
+
+            maxValue = qMax(value, maxValue);
+        }
+        
+        maxValue = qMin(maxValue, m_maxAmplitude);
+
+        qreal newLevel = qreal(maxValue) / m_maxAmplitude;
+
+//        qDebug() << maxValue << m_maxAmplitude << newLevel;
+
+        m_settings->drawMicVolume(newLevel);
 
         // write the sound sample to the output device to play back audio
         m_outputDevice->write(reinterpret_cast<char*>(outdata), size);
@@ -104,7 +127,7 @@ void MainWindow::readMore()
 
 void MainWindow::sliderValueChanged(int value)
 {
-    m_volume = value;
+    m_micVolume = value;
 }
 
 void MainWindow::menuAction(QAction* action)
@@ -112,9 +135,13 @@ void MainWindow::menuAction(QAction* action)
     if (action->text() == "&Settings") {
         m_settings->show();
 
-        // Change device after device is selected in combo box
+        // Change device after selection in combo box
         connect(m_settings, SIGNAL(deviceIsSelected()), this, SLOT(changeDevice()));
     }
+
+    if (action->text() == "&Exit")
+        qApp->exit();
+
     if (action->text() == "&About...")
         qDebug() << "We're in the \"about\" section!";
 }

@@ -29,7 +29,7 @@ public:
 private:
     void createAudioInput();
     void createAudioOutput();
-    int ApplyVolumeToSample(qint16 iSample);
+    qint16 ApplyVolumeToSample(qint16 iSample);
     void setNewDevice();
 
 private slots:
@@ -39,16 +39,21 @@ private slots:
     void changeDevice();
 
 private:
+    // Device properties
     QAudioDeviceInfo m_inputDeviceInfo;
     QAudioDeviceInfo m_outputDeviceInfo;
     QScopedPointer<QAudioInput> m_audioInput;
     QScopedPointer<QAudioOutput> m_audioOutput;
     QScopedPointer<QIODevice> m_inputDevice;
-//    QScopedPointer<QIODevice> m_outputDevice;  // Something went wrong with scoped ponter
     QIODevice*  m_outputDevice;
     QByteArray m_buffer;
     QAudioFormat m_format;
-    int m_volume = 0;
+    qint32 m_maxAmplitude;
+
+    int m_micVolume;
+    int m_phnVolume;
+
+    // Pointer to settings window
     Settings* m_settings;
 
 private:

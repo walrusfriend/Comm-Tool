@@ -27,8 +27,6 @@ Settings::Settings(QWidget *parent) :
             ui->cmb_output->addItem(device.deviceName(), QVariant::fromValue(device));
     }
     connect(ui->cmb_output, QOverload<int>::of(&QComboBox::activated), this, &Settings::outputDeviceChanged);
-
-    //show();
 }
 
 Settings::~Settings()
@@ -74,4 +72,9 @@ void Settings::outputDeviceChanged()
         }
     }
     qWarning("ERROR: Couldn't find this device!");
+}
+
+void Settings::drawMicVolume(qreal value)
+{
+    ui->vb_mic->setLevel(value);
 }

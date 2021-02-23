@@ -12,11 +12,13 @@ TEMPLATE = app
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
-    settings.cpp
+    settings.cpp \
+    volumebar.cpp
 
 HEADERS += \
     mainwindow.h \
-    settings.h
+    settings.h \
+    volumebar.h
 
 FORMS += \
     mainwindow.ui \

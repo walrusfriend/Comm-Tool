@@ -6,6 +6,8 @@
 #include <QAudioInput>
 #include <QAudioOutput>
 
+#include "volumebar.h"
+
 namespace Ui {
 class Settings;
 }
@@ -25,15 +27,20 @@ public slots:
     void inputDeviceChanged();
     void outputDeviceChanged();
     void emitAcceptSignal() { emit deviceIsSelected(); }
+    void drawMicVolume(qreal value);
 
 signals:
     void deviceIsSelected();
 
+
 private:
     Ui::Settings *ui;
 
+    // Device properties
     QAudioDeviceInfo inputDeviceInfo;
     QAudioDeviceInfo outputDeviceInfo;
+
+
 };
 
 #endif // SETTINGS_H
