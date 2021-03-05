@@ -8,7 +8,9 @@ Settings::Settings(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Settings),
     inputDeviceInfo(QAudioDeviceInfo::defaultInputDevice()),
-    outputDeviceInfo(QAudioDeviceInfo::defaultOutputDevice())
+    outputDeviceInfo(QAudioDeviceInfo::defaultOutputDevice()),
+    micVolume(50),
+    phonesVolume(50)
 {
     ui->setupUi(this);
 
@@ -27,6 +29,15 @@ Settings::Settings(QWidget *parent) :
             ui->cmb_output->addItem(device.deviceName(), QVariant::fromValue(device));
     }
     connect(ui->cmb_output, QOverload<int>::of(&QComboBox::activated), this, &Settings::outputDeviceChanged);
+
+    // Sliders settings
+    ui->m_mic_hsld->setValue(50);
+    ui->m_phones_hsld->setValue(50);
+
+    connect(ui->m_mic_hsld, SIGNAL(valueChanged(int)),
+            parent, SLOT(micSliderValueChanged(int)));
+    connect(ui->m_phones_hsld, SIGNAL(valueChanged(int)),
+            parent, SLOT(phonesSliderValueChanged(int)));
 }
 
 Settings::~Settings()
@@ -77,4 +88,14 @@ void Settings::outputDeviceChanged()
 void Settings::drawMicVolume(qreal value)
 {
     ui->vb_mic->setLevel(value);
+}
+
+void Settings::micVolumeSliderValueChanged(int value)
+{
+    micVolume = value;
+}
+
+void Settings::phonesVolumeSliderValueChanged(int value)
+{
+    phonesVolume = value;
 }

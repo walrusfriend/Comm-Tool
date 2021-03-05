@@ -1,3 +1,6 @@
+// Settings window
+// There user can adjust the mic and phones volume
+
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
@@ -22,12 +25,15 @@ public:
 
     QAudioDeviceInfo getInputInfo() { return inputDeviceInfo; }
     QAudioDeviceInfo getOutputInfo() { return outputDeviceInfo; }
+    qint8 getMicVolume() { return micVolume; }
 
 public slots:
     void inputDeviceChanged();
     void outputDeviceChanged();
     void emitAcceptSignal() { emit deviceIsSelected(); }
     void drawMicVolume(qreal value);
+    void micVolumeSliderValueChanged(int value);
+    void phonesVolumeSliderValueChanged(int value);
 
 signals:
     void deviceIsSelected();
@@ -39,6 +45,8 @@ private:
     // Device properties
     QAudioDeviceInfo inputDeviceInfo;
     QAudioDeviceInfo outputDeviceInfo;
+    qint8 micVolume;
+    qint8 phonesVolume;
 
 
 };

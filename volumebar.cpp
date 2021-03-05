@@ -12,6 +12,7 @@ VolumeBar::VolumeBar(QWidget* parent) : QWidget(parent)
     setMinimumWidth(200);
 }
 
+// draw the bar
 void VolumeBar::paintEvent(QPaintEvent*)
 {
     QPainter painter(this);
@@ -29,8 +30,7 @@ void VolumeBar::paintEvent(QPaintEvent*)
     if (m_level == 0)
         return;
 
-//    int pos = ((right - 20) - (left + 11)) * m_level;
-    int pos = ((painter.viewport().right()-20)-(painter.viewport().left()+11))*m_level;
+    int pos = ((right - 20) - (left + 11)) * m_level;
     painter.fillRect(left + 11,
                      top + 10,
                      pos,

@@ -34,9 +34,13 @@ private:
 
 private slots:
     void readMore();
-    void sliderValueChanged(int value);
+    void micSliderValueChanged(int value);
+    void phonesSliderValueChanged(int value);
     void menuAction(QAction* action);
     void changeDevice();
+
+protected:
+    void closeEvent(QCloseEvent* event);
 
 private:
     // Device properties
@@ -45,7 +49,7 @@ private:
     QScopedPointer<QAudioInput> m_audioInput;
     QScopedPointer<QAudioOutput> m_audioOutput;
     QScopedPointer<QIODevice> m_inputDevice;
-    QIODevice*  m_outputDevice;
+    QIODevice*  m_outputDevice;                 // I don't know why scoped pointer doesn't work for this var
     QByteArray m_buffer;
     QAudioFormat m_format;
     qint32 m_maxAmplitude;
@@ -55,8 +59,6 @@ private:
 
     // Pointer to settings window
     Settings* m_settings;
-
-private:
     Ui::MainWindow *ui;
 };
 

@@ -1,9 +1,9 @@
+// Displays the audio volume using the colored bars
+
 #ifndef VOLUMEBAR_H
 #define VOLUMEBAR_H
 
 #include <QWidget>
-
-// Displays the audio volume using the colored bars
 class VolumeBar : public QWidget
 {
     Q_OBJECT
