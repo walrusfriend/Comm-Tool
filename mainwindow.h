@@ -11,6 +11,11 @@
 #include <QScopedPointer>
 
 #include "settings.h"
+#include "tcpserver.h"
+#include "tcpclient.h"
+//#include "udpserver.h"
+//#include "udpclient.h"
+
 
 namespace Ui {
 class MainWindow;
@@ -39,6 +44,9 @@ private slots:
     void menuAction(QAction* action);
     void changeDevice();
 
+    // Network slots
+    void connectToServer();
+
 protected:
     void closeEvent(QCloseEvent* event);
 
@@ -49,7 +57,7 @@ private:
     QScopedPointer<QAudioInput> m_audioInput;
     QScopedPointer<QAudioOutput> m_audioOutput;
     QScopedPointer<QIODevice> m_inputDevice;
-    QIODevice*  m_outputDevice;                 // I don't know why scoped pointer doesn't work for this var
+    QIODevice* m_outputDevice; // I don't know why scoped pointer doesn't work
     QByteArray m_buffer;
     QAudioFormat m_format;
     qint32 m_maxAmplitude;
@@ -60,6 +68,19 @@ private:
     // Pointer to settings window
     Settings* m_settings;
     Ui::MainWindow *ui;
+
+    // Network members
+    // Will use peer-to-peer combined network
+    // TCP to chat and various confirmations
+    int port = 2021;
+    TcpServer* tcpServer;
+    TcpClient* tcpClient;
+
+    // TO DO
+    // UDP to data from microphone
+    //UdpServer* udpServer;
+    //UdpCliend* udpCliend;
+
 };
 
 #endif // MAINWINDOW_H

@@ -7,8 +7,8 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    MainWindow audio;
-    audio.show();
+    MainWindow mainWindow;
+    mainWindow.show();
 
     return a.exec();
 }

@@ -13,11 +13,15 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     settings.cpp \
+    tcpclient.cpp \
+    tcpserver.cpp \
     volumebar.cpp
 
 HEADERS += \
     mainwindow.h \
     settings.h \
+    tcpclient.h \
+    tcpserver.h \
     volumebar.h
 
 FORMS += \

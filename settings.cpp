@@ -34,6 +34,7 @@ Settings::Settings(QWidget *parent) :
     ui->m_mic_hsld->setValue(50);
     ui->m_phones_hsld->setValue(50);
 
+    // Linking siganls and slots
     connect(ui->m_mic_hsld, SIGNAL(valueChanged(int)),
             parent, SLOT(micSliderValueChanged(int)));
     connect(ui->m_phones_hsld, SIGNAL(valueChanged(int)),

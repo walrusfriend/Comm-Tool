@@ -10,11 +10,13 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     m_buffer(BUFFER_SIZE, 0),
     m_maxAmplitude(0),
-    m_micVolume(50),
+    m_micVolume(0),
     m_phnVolume(50),
     m_settings(new Settings(this)),
     ui(new Ui::MainWindow)
 {
+    ui->setupUi(this);
+
     // setup audio format
     m_format.setSampleRate(8000);
     m_format.setChannelCount(1);
@@ -45,7 +47,18 @@ MainWindow::MainWindow(QWidget *parent) :
     // Change device after selection in combo box
     connect(m_settings, SIGNAL(deviceIsSelected()), this, SLOT(changeDevice()));
 
-    ui->setupUi(this);
+    // TCP server
+    tcpServer = new TcpServer(port);
+    connect(tcpServer, SIGNAL(sendTextToChat(QString)),
+            ui->te_chat, SLOT(append(QString)));
+
+    // TCP client
+    tcpClient = new TcpClient;
+    connect(tcpClient, SIGNAL(sendTextToChat(QString)),
+            ui->te_chat, SLOT(append(QString)));
+
+    // Layout
+    ui->verticalLayout->addWidget(tcpClient);
 }
 
 MainWindow::~MainWindow()
@@ -84,11 +97,6 @@ qint16 MainWindow::ApplyVolumeToSample(qint16 iSample)
 // 3. Open I/O devices for read/write data
 void MainWindow::setNewDevice()
 {
-    if (!m_inputDevice.isNull())
-        m_audioInput->stop();
-    if (m_outputDevice == nullptr)
-        m_audioOutput->stop();
-
     createAudioInput();
     createAudioOutput();
 
@@ -167,6 +175,13 @@ void MainWindow::changeDevice()
     m_outputDeviceInfo = m_settings->getOutputInfo();
 
     setNewDevice();
+}
+
+void MainWindow::connectToServer()
+{
+    // TO DO Parse address line and check for correct ip
+    QString host = ui->le_address->text();
+    tcpClient->connectToHost(host, port);
 }
 
 // if main widnow is closed, it closes all windows of the program
