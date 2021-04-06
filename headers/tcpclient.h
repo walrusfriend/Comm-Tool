@@ -15,7 +15,7 @@ public:
     void connectToHost(const QString& host, const int port);
 
 signals:
-    void sendTextToChat(QString);
+    void signalSendTextToChat(QString);
 
 private:
     QTcpSocket* tcpSocket;

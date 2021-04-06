@@ -8,25 +8,30 @@ CONFIG += c++11
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
+INCLUDEPATH += headers/
+
 TEMPLATE = app
 SOURCES += \
-    main.cpp \
-    mainwindow.cpp \
-    settings.cpp \
-    tcpclient.cpp \
-    tcpserver.cpp \
-    volumebar.cpp
+    src/hostserver.cpp \
+    src/main.cpp \
+    src/mainwindow.cpp \
+    src/settings.cpp \
+    src/tcpclient.cpp \
+    src/tcpserver.cpp \
+    src/volumebar.cpp
 
 HEADERS += \
-    mainwindow.h \
-    settings.h \
-    tcpclient.h \
-    tcpserver.h \
-    volumebar.h
+    headers/hostserver.h \
+    headers/mainwindow.h \
+    headers/settings.h \
+    headers/tcpclient.h \
+    headers/tcpserver.h \
+    headers/volumebar.h
 
 FORMS += \
-    mainwindow.ui \
-    settings.ui
+    ui/hostserver.ui \
+    ui/mainwindow.ui \
+    ui/settings.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

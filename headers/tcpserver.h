@@ -17,7 +17,7 @@ public slots:
     void slotReadClient();
 
 signals:
-    void sendTextToChat(QString str);
+    void signalSendTextToChat(QString str);
 
 private:
     QTcpServer* m_tcpServer;

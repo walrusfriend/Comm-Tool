@@ -1,4 +1,4 @@
-#include <qmath.h>
+#include <cmath>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -10,9 +10,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     m_buffer(BUFFER_SIZE, 0),
     m_maxAmplitude(0),
-    m_micVolume(0),
-    m_phnVolume(50),
     m_settings(new Settings(this)),
+    m_hostServer(new HostServer(this)),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
@@ -44,17 +43,20 @@ MainWindow::MainWindow(QWidget *parent) :
     // Initialize I/O devices
     setNewDevice();
 
-    // Change device after selection in combo box
-    connect(m_settings, SIGNAL(deviceIsSelected()), this, SLOT(changeDevice()));
+    connect(this, SIGNAL(signalSendToPhones(qint16*, qint64&)),
+            this, SLOT(slotWriteData(qint16*, qint64&)));
 
-    // TCP server
-    tcpServer = new TcpServer(port);
-    connect(tcpServer, SIGNAL(sendTextToChat(QString)),
-            ui->te_chat, SLOT(append(QString)));
+    // Change device after selection in combo box
+    connect(m_settings, SIGNAL(signalDeviceIsSelected()), this, SLOT(slotChangeDevice()));
+
+    // Parse address line and check for correct ip
+    QRegExp exp("[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}:[0-9]{1,5}");
+    QValidator* val = new QRegExpValidator(exp, this);
+    ui->le_address->setValidator(val);
 
     // TCP client
     tcpClient = new TcpClient;
-    connect(tcpClient, SIGNAL(sendTextToChat(QString)),
+    connect(tcpClient, SIGNAL(signalSendTextToChat(QString)),
             ui->te_chat, SLOT(append(QString)));
 
     // Layout
@@ -85,16 +87,17 @@ void MainWindow::createAudioOutput()
     m_audioOutput.reset(new QAudioOutput(m_outputDeviceInfo, m_format, this));
 }
 
-// Modifies the input data by changing its volume
-qint16 MainWindow::ApplyVolumeToSample(qint16 iSample)
+// Modifies the input data by changing microphone volume
+qint16 MainWindow::applyMicVolumeToSample(qint16 iSample)
 {
-    return std::max(std::min((iSample * m_micVolume / 50), 32767), -32768);
+    return std::max(std::min((iSample * m_settings->getMicVolume() / 50), 32767), -32768);
 }
 
-// Disables the old I/O devices and connect the new devices
-// 1. Stops the existing devices
-// 2. Create new I/O
-// 3. Open I/O devices for read/write data
+qint16 MainWindow::applyPhonesVolumeToSample(qint16 iSample)
+{
+    return std::max(std::min((iSample * m_settings->getPhonesVolume() / 50), 32767), -32768);
+}
+
 void MainWindow::setNewDevice()
 {
     createAudioInput();
@@ -103,12 +106,14 @@ void MainWindow::setNewDevice()
     m_inputDevice.reset(m_audioInput->start());
     m_outputDevice = m_audioOutput->start();
 
-    connect(m_inputDevice.data(), SIGNAL(readyRead()), this, SLOT(readMore()));
+    connect(m_inputDevice.data(), SIGNAL(readyRead()), this, SLOT(slotReadData()));
 }
 
 // Read data from input device
-void MainWindow::readMore()
+void MainWindow::slotReadData()
 {
+    // TO DO Set logarithmic scale for the volume
+    // TO DO Fix stacked volume bars after close "Settings" window
     // check the number of samples in input buffer
     qint64 size = m_audioInput->bytesReady();
 
@@ -121,16 +126,16 @@ void MainWindow::readMore()
 
     // if something read...
     if (len > 0) {
-        qint16* outdata = reinterpret_cast<qint16*>(m_buffer.data());
+        // TO DO Depending on the format, defines the bit depth of the int (qint8, qint16...)
+        qint16* outdata = reinterpret_cast<qint16*> (m_buffer.data());
 
         qint32 maxValue = 0;
         for (int i = 0; i < len; ++i) {
-            // apply volume to raw data
-            outdata[i] = ApplyVolumeToSample(outdata[i]);
+            // apply micphone volume to raw data
+            outdata[i] = applyMicVolumeToSample(outdata[i]);
 
             // find max value for draw the volume bar
             qint32 value = outdata[i];
-
             maxValue = qMax(value, maxValue);
         }
         
@@ -140,25 +145,42 @@ void MainWindow::readMore()
 
         m_settings->drawMicVolume(newLevel);
 
-        // write the sound sample to the output device to play back audio
-        m_outputDevice->write(reinterpret_cast<char*>(outdata), size);
+        // write the sound sample to the output device to play back audio when check box is clicked
+        if (m_settings->isHearYourself())
+            emit signalSendToPhones(outdata, size);
+
+        // TO DO Send sample to the udp socket instead of phones
     }
 }
 
-void MainWindow::micSliderValueChanged(int value)
+// Take data from the udp socket and send to the phones
+void MainWindow::slotWriteData(qint16* outdata, qint64 &size)
 {
-    m_micVolume = value;
+    // Define max value to estimate and draw phones volume level
+    qint32 maxValue = 0;
+    for (int i = 0; i < size; ++i) {
+        // Apply phones volume to data
+        outdata[i] = applyPhonesVolumeToSample(outdata[i]);
+
+        // find max value for draw the volume bar
+        qint32 value = outdata[i];
+        maxValue = qMax(value, maxValue);
+    }
+    maxValue = qMin(maxValue, m_maxAmplitude);
+    qreal newLevel = qreal(maxValue) / m_maxAmplitude;
+    m_settings->drawPhonesVolume(newLevel);
+
+    m_outputDevice->write(reinterpret_cast<char*>(outdata), size);
 }
 
-void MainWindow::phonesSliderValueChanged(int value)
-{
-    m_phnVolume = value;
-}
-
-void MainWindow::menuAction(QAction* action)
+void MainWindow::slotMenuAction(QAction* action)
 {
     if (action->text() == "&Settings") {
         m_settings->show();
+    }
+
+    if (action->text() == "&Host server"){
+        m_hostServer->show();
     }
 
     if (action->text() == "&Exit")
@@ -169,7 +191,7 @@ void MainWindow::menuAction(QAction* action)
 }
 
 // Set new device
-void MainWindow::changeDevice()
+void MainWindow::slotChangeDevice()
 {
     m_inputDeviceInfo = m_settings->getInputInfo();
     m_outputDeviceInfo = m_settings->getOutputInfo();
@@ -177,11 +199,10 @@ void MainWindow::changeDevice()
     setNewDevice();
 }
 
-void MainWindow::connectToServer()
+void MainWindow::slotConnectToServer()
 {
-    // TO DO Parse address line and check for correct ip
-    QString host = ui->le_address->text();
-    tcpClient->connectToHost(host, port);
+    QStringList dict = ui->le_address->text().split(":");
+    tcpClient->connectToHost(dict[0], dict[1].toInt());
 }
 
 // if main widnow is closed, it closes all windows of the program

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>HostServer</class>
+ <widget class="QDialog" name="HostServer">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>212</width>
+    <height>77</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>212</width>
+    <height>77</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>212</width>
+    <height>77</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Host Server</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Enter a port:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QLineEdit" name="le_port">
+         <property name="placeholderText">
+          <string>Example: 2021</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pbt_create">
+         <property name="text">
+          <string>&amp;Create</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>pbt_create</sender>
+   <signal>clicked()</signal>
+   <receiver>HostServer</receiver>
+   <slot>hide()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>178</x>
+     <y>52</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>208</x>
+     <y>34</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

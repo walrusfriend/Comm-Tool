@@ -11,7 +11,7 @@
 #include <QScopedPointer>
 
 #include "settings.h"
-#include "tcpserver.h"
+#include "hostserver.h"
 #include "tcpclient.h"
 //#include "udpserver.h"
 //#include "udpclient.h"
@@ -34,18 +34,22 @@ public:
 private:
     void createAudioInput();
     void createAudioOutput();
-    qint16 ApplyVolumeToSample(qint16 iSample);
+    inline qint16 applyMicVolumeToSample(qint16 iSample);
+    inline qint16 applyPhonesVolumeToSample(qint16 iSample);
     void setNewDevice();
 
+signals:
+    void signalSendToPhones(qint16*, qint64&);
+
 private slots:
-    void readMore();
-    void micSliderValueChanged(int value);
-    void phonesSliderValueChanged(int value);
-    void menuAction(QAction* action);
-    void changeDevice();
+    // Now we rad from mic and send to phons, bit later...
+    void slotReadData();                // Read data from mic and send to UdpSocket
+    void slotWriteData(qint16*, qint64&); // Write data from UdpSocket and send to phones
+    void slotMenuAction(QAction* action);
+    void slotChangeDevice();
 
     // Network slots
-    void connectToServer();
+    void slotConnectToServer();
 
 protected:
     void closeEvent(QCloseEvent* event);
@@ -62,18 +66,17 @@ private:
     QAudioFormat m_format;
     qint32 m_maxAmplitude;
 
-    int m_micVolume;
-    int m_phnVolume;
-
-    // Pointer to settings window
+    // Settings window
     Settings* m_settings;
+    // Host create window
+    HostServer* m_hostServer;
+
     Ui::MainWindow *ui;
 
     // Network members
     // Will use peer-to-peer combined network
     // TCP to chat and various confirmations
-    int port = 2021;
-    TcpServer* tcpServer;
+//    TcpServer* tcpServer;
     TcpClient* tcpClient;
 
     // TO DO

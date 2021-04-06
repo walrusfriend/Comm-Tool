@@ -20,7 +20,8 @@ Settings::Settings(QWidget *parent) :
         if (device != QAudioDeviceInfo::defaultInputDevice())
             ui->cmb_input->addItem(device.deviceName(), QVariant::fromValue(device));
     }
-    connect(ui->cmb_input, QOverload<int>::of(&QComboBox::activated), this, &Settings::inputDeviceChanged);
+    connect(ui->cmb_input, QOverload<int>::of(&QComboBox::activated),
+            this, &Settings::slotInputDeviceChanged);
 
     // set output devices
     ui->cmb_output->addItem("Default", QVariant(QString()));
@@ -28,17 +29,14 @@ Settings::Settings(QWidget *parent) :
         if (device != QAudioDeviceInfo::defaultOutputDevice())
             ui->cmb_output->addItem(device.deviceName(), QVariant::fromValue(device));
     }
-    connect(ui->cmb_output, QOverload<int>::of(&QComboBox::activated), this, &Settings::outputDeviceChanged);
-
-    // Sliders settings
-    ui->m_mic_hsld->setValue(50);
-    ui->m_phones_hsld->setValue(50);
+    connect(ui->cmb_output, QOverload<int>::of(&QComboBox::activated),
+            this, &Settings::slotOutputDeviceChanged);
 
     // Linking siganls and slots
     connect(ui->m_mic_hsld, SIGNAL(valueChanged(int)),
-            parent, SLOT(micSliderValueChanged(int)));
+            this, SLOT(slotMicVolumeSliderValueChanged(int)));
     connect(ui->m_phones_hsld, SIGNAL(valueChanged(int)),
-            parent, SLOT(phonesSliderValueChanged(int)));
+            this, SLOT(slotPhonesVolumeSliderValueChanged(int)));
 }
 
 Settings::~Settings()
@@ -46,57 +44,52 @@ Settings::~Settings()
     delete ui;
 }
 
-void Settings::inputDeviceChanged()
+void Settings::slotInputDeviceChanged()
 {
     QString soughtName = ui->cmb_input->currentText();
 
     if (soughtName == "Default") {
         inputDeviceInfo = QAudioDeviceInfo::defaultInputDevice();
-        emit deviceIsSelected();
+        emit signalDeviceIsSelected();
         return;
     }
 
     for (auto &device: QAudioDeviceInfo::availableDevices(QAudio::AudioInput)) {
         if (device.deviceName() == soughtName) {
             inputDeviceInfo = device;
-            emit deviceIsSelected();
+            emit signalDeviceIsSelected();
             return;
         }
     }
     qWarning("ERROR: Couldn't find this device!");
 }
 
-void Settings::outputDeviceChanged()
+void Settings::slotOutputDeviceChanged()
 {
     QString soughtName = ui->cmb_output->currentText();
 
     if (soughtName == "Default") {
         outputDeviceInfo = QAudioDeviceInfo::defaultOutputDevice();
-        emit deviceIsSelected();
+        emit signalDeviceIsSelected();
         return;
     }
 
     for (auto &device: QAudioDeviceInfo::availableDevices(QAudio::AudioOutput)) {
         if (device.deviceName() == soughtName) {
             outputDeviceInfo = device;
-            emit deviceIsSelected();
+            emit signalDeviceIsSelected();
             return;
         }
     }
     qWarning("ERROR: Couldn't find this device!");
 }
 
-void Settings::drawMicVolume(qreal value)
-{
-    ui->vb_mic->setLevel(value);
-}
+void Settings::drawMicVolume(qreal value) { ui->vb_mic->setLevel(value); }
 
-void Settings::micVolumeSliderValueChanged(int value)
-{
-    micVolume = value;
-}
+void Settings::drawPhonesVolume(qreal value) { ui->vb_phones->setLevel(value); }
 
-void Settings::phonesVolumeSliderValueChanged(int value)
-{
-    phonesVolume = value;
-}
+bool Settings::isHearYourself() { return ui->chb_hearYourself->isChecked(); }
+
+void Settings::slotMicVolumeSliderValueChanged(int value) { micVolume = value; }
+
+void Settings::slotPhonesVolumeSliderValueChanged(int value) { phonesVolume = value; }

@@ -51,7 +51,7 @@ void TcpClient::slotReadyToRead()
 
         // write to chat
         QString message = time.toString() + " " + str;
-        emit sendTextToChat(message);
+        emit signalSendTextToChat(message);
 
         nextBlockSize = 0;
     }
@@ -66,7 +66,7 @@ void TcpClient::slotError(QAbstractSocket::SocketError err)
                                  err == QAbstractSocket::ConnectionRefusedError ?
                                  "The connection was refused." :
                                  QString(tcpSocket->errorString()));
-    emit sendTextToChat(error);
+    emit signalSendTextToChat(error);
 }
 
 void TcpClient::slotSendToServer()
@@ -85,5 +85,5 @@ void TcpClient::slotSendToServer()
 
 void TcpClient::slotConnected()
 {
-    emit sendTextToChat("Connection established!");
+    emit signalSendTextToChat("Connection established!");
 }

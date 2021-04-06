@@ -12,6 +12,9 @@ TcpServer::TcpServer(int port, QWidget* parent) :
         m_tcpServer->close();
         return;
     }
+
+    emit signalSendTextToChat("Server created");
+
     connect(m_tcpServer, SIGNAL(newConnection()),
             this, SLOT(slotNewConnection()));
 }
@@ -50,7 +53,7 @@ void TcpServer::slotReadClient()
         QString message = time.toString() + " " + "Client has sent: " + str;
 
         // write message to chat
-        emit sendTextToChat(message);
+        emit signalSendTextToChat(message);
 
         m_nextBlockSize = 0;
 

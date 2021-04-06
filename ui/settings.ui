@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>251</height>
+    <height>243</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -29,7 +29,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Settings</string>
   </property>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
@@ -37,7 +37,7 @@
      <x>10</x>
      <y>11</y>
      <width>381</width>
-     <height>231</height>
+     <height>221</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -56,21 +56,37 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
       <item row="1" column="0" colspan="2">
        <widget class="QComboBox" name="cmb_input"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="pix_mic">
+        <property name="midLineWidth">
+         <number>0</number>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap resource="../sources.qrc">:/image/microphone.png</pixmap>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QCheckBox" name="chb_hearYourself">
+        <property name="layoutDirection">
+         <enum>Qt::RightToLeft</enum>
+        </property>
+        <property name="text">
+         <string>To hear yourself</string>
+        </property>
+        <property name="tristate">
+         <bool>false</bool>
+        </property>
+       </widget>
       </item>
       <item row="2" column="1">
        <layout class="QVBoxLayout" name="verticalLayout">
@@ -83,8 +99,11 @@
         </item>
         <item>
          <widget class="QSlider" name="m_mic_hsld">
+          <property name="value">
+           <number>50</number>
+          </property>
           <property name="sliderPosition">
-           <number>0</number>
+           <number>50</number>
           </property>
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -93,22 +112,6 @@
         </item>
        </layout>
       </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="pix_mic">
-        <property name="midLineWidth">
-         <number>0</number>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="pixmap">
-         <pixmap resource="sources.qrc">:/image/microphone.png</pixmap>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
      </layout>
     </item>
     <item>
@@ -116,6 +119,16 @@
       <property name="labelAlignment">
        <set>Qt::AlignCenter</set>
       </property>
+      <property name="formAlignment">
+       <set>Qt::AlignHCenter|Qt::AlignTop</set>
+      </property>
+      <item row="0" column="0">
+       <widget class="QLabel" name="lbl_outputDevice">
+        <property name="text">
+         <string>Output device</string>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="1">
        <spacer name="horizontalSpacer_2">
         <property name="orientation">
@@ -132,30 +145,27 @@
       <item row="1" column="0" colspan="2">
        <widget class="QComboBox" name="cmb_output"/>
       </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="lbl_outputDevice">
-        <property name="text">
-         <string>Output device</string>
-        </property>
-       </widget>
-      </item>
       <item row="2" column="0">
        <widget class="QLabel" name="pix_phn">
         <property name="text">
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="sources.qrc">:/image/headphones.png</pixmap>
+         <pixmap resource="../sources.qrc">:/image/headphones.png</pixmap>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
         </property>
        </widget>
       </item>
       <item row="2" column="1">
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
-         <widget class="VolumeBar" name="vb_phn" native="true">
+         <widget class="VolumeBar" name="vb_phones" native="true">
           <property name="autoFillBackground">
            <bool>false</bool>
           </property>
+          <layout class="QVBoxLayout" name="verticalLayout_4"/>
          </widget>
         </item>
         <item>
@@ -194,7 +204,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="sources.qrc"/>
+  <include location="../sources.qrc"/>
  </resources>
  <connections>
   <connection>
