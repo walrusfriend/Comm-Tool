@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QtNetwork>
 #include <QtWidgets>
+#include <QHostAddress>
 
 class TcpServer : public QWidget
 {
@@ -11,6 +12,10 @@ class TcpServer : public QWidget
 
 public:
     TcpServer(int port, QWidget* parent = 0);
+
+    bool isListening() { return m_tcpServer->isListening(); }
+    QHostAddress serverAddress() { return m_tcpServer->serverAddress(); }
+    qint16 serverPort() { return m_tcpServer->serverPort(); }
 
 public slots:
     virtual void slotNewConnection();
@@ -23,6 +28,8 @@ private:
     QTcpServer* m_tcpServer;
     QTextEdit* m_txt;
     quint16 m_nextBlockSize;
+
+    QString serverName;
 
 private:
     void sendToClient(QTcpSocket* socket, const QString &str);

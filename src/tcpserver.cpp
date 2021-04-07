@@ -2,7 +2,8 @@
 
 TcpServer::TcpServer(int port, QWidget* parent) :
     QWidget(parent),
-    m_nextBlockSize(0)
+    m_nextBlockSize(0),
+    serverName(QHostInfo::localHostName())
 {
     m_tcpServer = new QTcpServer(this);
     // Close server if error sutiation is occured
@@ -13,6 +14,7 @@ TcpServer::TcpServer(int port, QWidget* parent) :
         return;
     }
 
+    // Write start message to the chat
     emit signalSendTextToChat("Server created");
 
     connect(m_tcpServer, SIGNAL(newConnection()),
@@ -50,14 +52,14 @@ void TcpServer::slotReadClient()
         QString str;
         in >> time >> str;
 
-        QString message = time.toString() + " " + "Client has sent: " + str;
+        QString message = time.toString() + " " + "Client: " + str;
 
         // write message to chat
         emit signalSendTextToChat(message);
 
         m_nextBlockSize = 0;
 
-        sendToClient(clientSocket, "Server Response: Received \"" + str + "\"");
+        sendToClient(clientSocket, serverName + ": " + str);
     }
 }
 

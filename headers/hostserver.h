@@ -2,6 +2,7 @@
 #define HOSTSERVER_H
 
 #include <QDialog>
+#include <QHostAddress>
 
 #include "tcpserver.h"
 

@@ -2,7 +2,8 @@
 
 TcpClient::TcpClient(QWidget *parent) :
     QWidget(parent),
-    nextBlockSize(0)
+    nextBlockSize(0),
+    UserName(QHostInfo::localHostName())
 {
     tcpSocket = new QTcpSocket(this);
 
@@ -35,6 +36,17 @@ void TcpClient::connectToHost(const QString &host, const int port)
         tcpSocket->state() == QAbstractSocket::ConnectingState)
     {
         inputTextLine->setFocus();
+
+        // Send a welcome message to the server
+        QByteArray arrBlock;
+        QDataStream out(&arrBlock, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_5_3);
+        out << quint16(0) << QTime::currentTime() << QString(UserName + " is connected!");
+
+        out.device()->seek(0);
+        out << quint16(arrBlock.size() - sizeof(quint16));
+
+        tcpSocket->write(arrBlock);
     }
 
 }
@@ -87,9 +99,13 @@ void TcpClient::slotSendToServer()
     out.device()->seek(0);
     out << quint16(arrBlock.size() - sizeof(quint16));
 
-    inputTextLine->clear();
     if(tcpSocket->write(arrBlock) == -1)
         emit signalSendTextToChat("Connect to server first!");
+    else
+        emit signalSendTextToChat(QTime::currentTime().toString() + ' ' +
+                                  UserName + ": " +
+                                  inputTextLine->text());
+    inputTextLine->clear();
 }
 
 void TcpClient::slotConnected()

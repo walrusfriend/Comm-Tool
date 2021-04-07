@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QTcpSocket>
 #include <QtWidgets>
+#include <QHostInfo>
 
 class TcpClient : public QWidget
 {
@@ -23,6 +24,8 @@ private:
     QHBoxLayout* hlayout;
     QLineEdit* inputTextLine;
     QPushButton* pbt_send;
+
+    QString UserName;
 
 private slots:
     void slotReadyToRead();

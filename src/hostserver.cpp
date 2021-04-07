@@ -31,4 +31,7 @@ void HostServer::slotCreateTcpServer()
 
     // Connect server with chat via a signal
     connect(tcpServer, SIGNAL(signalSendTextToChat(QString)), SIGNAL(signalSendTextToChat(QString)));
+
+    if (tcpServer->isListening())
+        emit signalSendTextToChat("Server created!");
 }

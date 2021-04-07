@@ -3,6 +3,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+// TO DO Implement data compession ot raw microphone data
+
 const qint16 BUFFER_SIZE = 14096;
 const qint16 LIMIT_SAMPLE = 4096;
 
