@@ -29,6 +29,14 @@ TcpClient::TcpClient(QWidget *parent) :
 void TcpClient::connectToHost(const QString &host, const int port)
 {
     tcpSocket->connectToHost(host, port);
+
+    // If connection establish set focus on chat line
+    if (tcpSocket->state() == QAbstractSocket::ConnectedState ||
+        tcpSocket->state() == QAbstractSocket::ConnectingState)
+    {
+        inputTextLine->setFocus();
+    }
+
 }
 
 void TcpClient::slotReadyToRead()
@@ -80,7 +88,8 @@ void TcpClient::slotSendToServer()
     out << quint16(arrBlock.size() - sizeof(quint16));
 
     inputTextLine->clear();
-    tcpSocket->write(arrBlock);
+    if(tcpSocket->write(arrBlock) == -1)
+        emit signalSendTextToChat("Connect to server first!");
 }
 
 void TcpClient::slotConnected()

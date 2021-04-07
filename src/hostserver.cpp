@@ -12,6 +12,7 @@ HostServer::HostServer(QWidget *parent) :
     QValidator* val = new QRegExpValidator(exp, this);
     ui->le_port->setValidator(val);
 
+    // When the button is clicked, a server is created
     connect(ui->pbt_create, SIGNAL(clicked()), SLOT(slotCreateTcpServer()));
 }
 
@@ -28,7 +29,6 @@ void HostServer::slotCreateTcpServer()
     // createTCP server
     tcpServer = new TcpServer(port, this);
 
-    // TO DO Connect server with chat
-    connect(tcpServer, SIGNAL(signalSendTextToChat(QString)),
-            parent()->getChatWidget(), SLOT(append(QString)));
+    // Connect server with chat via a signal
+    connect(tcpServer, SIGNAL(signalSendTextToChat(QString)), SIGNAL(signalSendTextToChat(QString)));
 }

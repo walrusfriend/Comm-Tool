@@ -19,6 +19,9 @@ public:
 
     TcpServer* tcpServer;
 
+signals:
+    void signalSendTextToChat(QString);
+
 public slots:
     void slotCreateTcpServer();
 

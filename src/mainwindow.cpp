@@ -59,8 +59,16 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(tcpClient, SIGNAL(signalSendTextToChat(QString)),
             ui->te_chat, SLOT(append(QString)));
 
+    // connect TCP server to chat
+    connect(m_hostServer, SIGNAL(signalSendTextToChat(QString)),
+            ui->te_chat, SLOT(append(QString)));
+
+    // When the enter key is pressed, emit a signal like a "connect" button
+    connect(ui->le_address, SIGNAL(returnPressed()), ui->pbt_connect, SIGNAL(clicked()));
+
     // Layout
     ui->verticalLayout->addWidget(tcpClient);
+
 }
 
 MainWindow::~MainWindow()
