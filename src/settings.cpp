@@ -8,9 +8,7 @@ Settings::Settings(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Settings),
     inputDeviceInfo(QAudioDeviceInfo::defaultInputDevice()),
-    outputDeviceInfo(QAudioDeviceInfo::defaultOutputDevice()),
-    micVolume(50),
-    phonesVolume(50)
+    outputDeviceInfo(QAudioDeviceInfo::defaultOutputDevice())
 {
     ui->setupUi(this);
 
@@ -32,11 +30,15 @@ Settings::Settings(QWidget *parent) :
     connect(ui->cmb_output, QOverload<int>::of(&QComboBox::activated),
             this, &Settings::slotOutputDeviceChanged);
 
-    // Linking siganls and slots
+    // Linking signals and slots
     connect(ui->m_mic_hsld, SIGNAL(valueChanged(int)),
-            this, SLOT(slotMicVolumeSliderValueChanged(int)));
+            this, SIGNAL(signalMicVolumeChanged(int)));
     connect(ui->m_phones_hsld, SIGNAL(valueChanged(int)),
-            this, SLOT(slotPhonesVolumeSliderValueChanged(int)));
+            this, SIGNAL(signalPhonesVolumeChanged(int)));
+
+    // Send signal when chech box is checked
+    connect(ui->chb_hearYourself, SIGNAL(stateChanged(int)),
+            this, SIGNAL(signalHearYourselfStateChanged(int)));
 }
 
 Settings::~Settings()
@@ -50,14 +52,14 @@ void Settings::slotInputDeviceChanged()
 
     if (soughtName == "Default") {
         inputDeviceInfo = QAudioDeviceInfo::defaultInputDevice();
-        emit signalDeviceIsSelected();
+        emit signalDeviceIsSelected({inputDeviceInfo, outputDeviceInfo});
         return;
     }
 
     for (auto &device: QAudioDeviceInfo::availableDevices(QAudio::AudioInput)) {
         if (device.deviceName() == soughtName) {
             inputDeviceInfo = device;
-            emit signalDeviceIsSelected();
+            emit signalDeviceIsSelected({inputDeviceInfo, outputDeviceInfo});
             return;
         }
     }
@@ -70,26 +72,22 @@ void Settings::slotOutputDeviceChanged()
 
     if (soughtName == "Default") {
         outputDeviceInfo = QAudioDeviceInfo::defaultOutputDevice();
-        emit signalDeviceIsSelected();
+        emit signalDeviceIsSelected({inputDeviceInfo, outputDeviceInfo});
         return;
     }
 
     for (auto &device: QAudioDeviceInfo::availableDevices(QAudio::AudioOutput)) {
         if (device.deviceName() == soughtName) {
             outputDeviceInfo = device;
-            emit signalDeviceIsSelected();
+            emit signalDeviceIsSelected({inputDeviceInfo, outputDeviceInfo});
             return;
         }
     }
     qWarning("ERROR: Couldn't find this device!");
 }
 
-void Settings::drawMicVolume(qreal value) { ui->vb_mic->setLevel(value); }
+void Settings::drawMicVolume(qreal& value) { ui->vb_mic->setLevel(value); }
 
-void Settings::drawPhonesVolume(qreal value) { ui->vb_phones->setLevel(value); }
+void Settings::drawPhonesVolume(qreal& value) { ui->vb_phones->setLevel(value); }
 
 bool Settings::isHearYourself() { return ui->chb_hearYourself->isChecked(); }
-
-void Settings::slotMicVolumeSliderValueChanged(int value) { micVolume = value; }
-
-void Settings::slotPhonesVolumeSliderValueChanged(int value) { phonesVolume = value; }

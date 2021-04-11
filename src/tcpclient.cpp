@@ -40,7 +40,7 @@ void TcpClient::connectToHost(const QString &host, const int port)
         // Send a welcome message to the server
         QByteArray arrBlock;
         QDataStream out(&arrBlock, QIODevice::WriteOnly);
-        out.setVersion(QDataStream::Qt_5_3);
+        out.setVersion(QDataStream::Qt_5_15);
         out << quint16(0) << QTime::currentTime() << QString(UserName + " is connected!");
 
         out.device()->seek(0);
@@ -54,7 +54,7 @@ void TcpClient::connectToHost(const QString &host, const int port)
 void TcpClient::slotReadyToRead()
 {
     QDataStream in(tcpSocket);
-    in.setVersion(QDataStream::Qt_5_3);
+    in.setVersion(QDataStream::Qt_5_15);
     for (;;) {
         if (!nextBlockSize) {
             if (tcpSocket->bytesAvailable() < sizeof(quint16))
@@ -93,7 +93,7 @@ void TcpClient::slotSendToServer()
 {
     QByteArray arrBlock;
     QDataStream out(&arrBlock, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_5_3);
+    out.setVersion(QDataStream::Qt_5_15);
     out << quint16(0) << QTime::currentTime() << inputTextLine->text();
 
     out.device()->seek(0);

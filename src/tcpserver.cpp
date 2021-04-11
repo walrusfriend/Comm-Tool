@@ -37,7 +37,7 @@ void TcpServer::slotReadClient()
 {
     QTcpSocket* clientSocket = (QTcpSocket*) sender();
     QDataStream in(clientSocket);
-    in.setVersion(QDataStream::Qt_5_3);
+    in.setVersion(QDataStream::Qt_5_15);
     for(;;) {
         if (!m_nextBlockSize) {
             if (clientSocket->bytesAvailable() < sizeof(quint16))
@@ -59,7 +59,8 @@ void TcpServer::slotReadClient()
 
         m_nextBlockSize = 0;
 
-        sendToClient(clientSocket, serverName + ": " + str);
+        // Send to the client that the server read a message
+        //sendToClient(clientSocket, serverName + ": " + str);
     }
 }
 
@@ -67,7 +68,7 @@ void TcpServer::sendToClient(QTcpSocket *socket, const QString &str)
 {
     QByteArray arrBlock;
     QDataStream out(&arrBlock, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_5_3);
+    out.setVersion(QDataStream::Qt_5_15);
     out << quint16(0) << QTime::currentTime() << str;
 
     out.device()->seek(0);

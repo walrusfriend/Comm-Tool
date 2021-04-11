@@ -12,7 +12,7 @@ INCLUDEPATH += headers/
 
 TEMPLATE = app
 SOURCES += \
-    src/hostserver.cpp \
+    src/audiointerface.cpp \
     src/main.cpp \
     src/mainwindow.cpp \
     src/settings.cpp \
@@ -21,15 +21,14 @@ SOURCES += \
     src/volumebar.cpp
 
 HEADERS += \
-    headers/hostserver.h \
     headers/mainwindow.h \
     headers/settings.h \
     headers/tcpclient.h \
     headers/tcpserver.h \
-    headers/volumebar.h
+    headers/volumebar.h \
+    headers/audiointerface.h
 
 FORMS += \
-    ui/hostserver.ui \
     ui/mainwindow.ui \
     ui/settings.ui
 

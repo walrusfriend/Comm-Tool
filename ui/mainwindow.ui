@@ -89,7 +89,6 @@
     </property>
     <addaction name="actionSettings"/>
     <addaction name="separator"/>
-    <addaction name="actionHost_server"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>

@@ -27,21 +27,19 @@ public:
     QAudioDeviceInfo getOutputInfo() { return outputDeviceInfo; }
 
 public:
-    quint8 getMicVolume() { return micVolume; }
-    quint8 getPhonesVolume() { return phonesVolume; }
-    void drawMicVolume(qreal value);
-    void drawPhonesVolume(qreal value);
     bool isHearYourself();
 
 public slots:
+    void drawMicVolume(qreal& value);
+    void drawPhonesVolume(qreal& value);
     void slotInputDeviceChanged();
     void slotOutputDeviceChanged();
-    void slotMicVolumeSliderValueChanged(int value);
-    void slotPhonesVolumeSliderValueChanged(int value);
 
 signals:
-    void signalDeviceIsSelected();
-
+    void signalHearYourselfStateChanged(int);
+    void signalDeviceIsSelected(QList<QAudioDeviceInfo>);
+    void signalMicVolumeChanged(int);
+    void signalPhonesVolumeChanged(int);
 
 private:
     Ui::Settings *ui;
@@ -49,9 +47,6 @@ private:
     // Device properties
     QAudioDeviceInfo inputDeviceInfo;
     QAudioDeviceInfo outputDeviceInfo;
-    qint8 micVolume;
-    qint8 phonesVolume;
-
 };
 
 #endif // SETTINGS_H
